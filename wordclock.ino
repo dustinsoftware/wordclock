@@ -1,3 +1,4 @@
+// Word clock logic modified from https://github.com/wouterdevinck/wordclock
 
 #include <stdint.h>
 #include <TFT.h>
