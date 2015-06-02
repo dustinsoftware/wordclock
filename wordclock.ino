@@ -3,10 +3,22 @@
 #include <stdint.h>
 #include <TFT.h>
 #include <Time.h>
+#include <TouchScreen.h>
+
+#define YP A2   // must be an analog pin, use "An" notation!
+#define XM A1   // must be an analog pin, use "An" notation!
+#define YM 54   // can be a digital pin, this is A0
+#define XP 57   // can be a digital pin, this is A3
+#define TS_MINX 140
+#define TS_MAXX 900
+#define TS_MINY 120
+#define TS_MAXY 940
+
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 
 // Tasks
 const int wait = 10;
-const int noTasks = 1;
+const int noTasks = 2;
 typedef struct Tasks {
    long unsigned int previous;
    int interval;
@@ -122,7 +134,7 @@ void setup()
  // Tft.drawString("Testing.",80,0,1,WHITE);
   bool emptyFrame[16][16] = {0};
   updateDisplay(emptyFrame, emptyFrame, 1);  
-  setTime(22,46,00,31,05,2015);
+  setTime(9,9,00,31,05,2015);
 }
 
 
@@ -237,7 +249,7 @@ void updateDisplay(boolean previousframe[16][16], boolean frame[16][16], boolean
       strcpy_P(currentLineBuffer, (char*)pgm_read_word(&characterGrid[y]));
       
       previousframe[y][x] = frame[y][x];
-      Tft.drawChar(currentLineBuffer[x], 239 - x * 15, 319 - y * 21, 2, frame[y][x] ? RED : GRAY2);
+      Tft.drawChar(currentLineBuffer[x], 239 - x * 15, 319 - y * 21, 2, frame[y][x] ? YELLOW : GRAY2);
     }
   }
 }
@@ -248,6 +260,22 @@ void addWordToFrame(const int theword[3], boolean frame[16][16]){
   }
 }
 
+void readInput() {
+  TSPoint p = ts.getPoint();
+  p.x = map(p.x, TS_MINX, TS_MAXX, 240, 0);
+  p.y = map(p.y, TS_MINY, TS_MAXY, 320, 0);
+  if (p.z < ts.pressureThreshhold)
+    return;
+
+  if (p.x < 120) {
+    adjustTime(p.y < 240 ? 60 : -60);
+  } else {
+    adjustTime(p.y < 240 ? 3600 : -3600);
+  }
+
+  showTime();
+}
+
 void loadTasks() {
   
   // Show time
@@ -255,6 +283,9 @@ void loadTasks() {
   tasks[0].interval = 1000;
   tasks[0].function = showTime;
   
+  tasks[1].previous = 0;
+  tasks[1].interval = 0;
+  tasks[1].function = readInput;
 }
 
 void loop() {
