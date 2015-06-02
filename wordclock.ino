@@ -215,22 +215,22 @@ void showTime() {
     }
   
     // Time of day
-    if(h < 6) {
-      addWordToFrame(w_at, frame);
-      addWordToFrame(w_night, frame);
-    } else if(h < 12) {
+    if(h < 12) {
       addWordToFrame(w_in, frame);
       addWordToFrame(w_the, frame);
       addWordToFrame(w_morning, frame);
-    } else if(h < 18) {
+    } else if(h < 17) {
       addWordToFrame(w_in, frame);
       addWordToFrame(w_the, frame);
       addWordToFrame(w_afternoon, frame);
+    } else if(h < 20) {
+      addWordToFrame(w_in, frame);
+      addWordToFrame(w_the, frame);
+      addWordToFrame(w_evening, frame);
     } else {
       addWordToFrame(w_at, frame);
       addWordToFrame(w_night, frame);
     }
-    
   }
 
   // Update display
